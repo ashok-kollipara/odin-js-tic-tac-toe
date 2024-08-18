@@ -52,6 +52,7 @@ const ticTacToe = (() => {
         } else {
             console.log("incrementing current chance")
             currentChance+=1
+            console.log("current chance is now", currentChance)
         }
     }
 
@@ -108,7 +109,7 @@ const ticTacToe = (() => {
     // run game
     function _runGame(pos) {
         console.warn("Gameboard length is", gameBoard.board.length)
-        if (currentChance < gameBoard.board.length) {
+        if (currentChance < (gameBoard.board.length - 1)) {
             if (currentChance % 2 == 0) {
                 const p1_chance = _markSign(gameBoard.player1.sign, pos)
                 if (!p1_chance.updated) {
@@ -137,7 +138,7 @@ const ticTacToe = (() => {
                 return {updated: p2_chance.updated}
             }
         } else {
-            return { result: "drawn"}
+            return { result: "Game Drawn"}
         }
     }
 
@@ -196,7 +197,7 @@ const ticTacToe = (() => {
     // reset game
     function resetGame() {
         console.warn("resetting game")
-        gameBoard.board = new Array(9)
+        location.reload()
     }
 
     // create players

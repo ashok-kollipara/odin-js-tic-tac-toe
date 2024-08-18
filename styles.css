@@ -31,3 +31,26 @@ body {
     text-align: center;
     align-items: center;
 }
+
+.show-current-turn, .game-result{
+    margin-top: 2vh;
+    font-size: 24px;
+}
+
+.show-current-turn {
+    color: brown
+}
+
+.game-result {
+    color: green
+}
+
+label {
+    font-weight: 700;
+}
+
+label, input[type="submit"], input[type="text"] {
+    padding: 4px;
+    margin-top: 12px;
+    font-size: 32px;
+}
