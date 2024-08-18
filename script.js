@@ -7,7 +7,7 @@ const ticTacToe = (() => {
     function createBoard() {
         const board = new Array(9)
         for (let i=0; i < board.length; i++) {
-            board[i] = "_"
+            board[i] = "."
         }
         return {
             board: board,
@@ -19,6 +19,9 @@ const ticTacToe = (() => {
     // setup game board
     const gameBoard = createBoard()
 
+    //
+    let currentChance = 0
+
     // get html elements
     const inputModal = document.querySelector(".input-modal")
     const formSubmitButton = document.querySelector("#submit-players")
@@ -26,11 +29,31 @@ const ticTacToe = (() => {
     const resetGameButton = document.querySelector(".reset-game")
     const viewBoard = document.querySelector(".game-board")
     const turnIndicator = document.querySelector(".show-current-turn")
+    const resultDisplay = document.querySelector(".game-result")
 
     // handle bindings
     startGameButton.addEventListener("click", initGame)
     formSubmitButton.addEventListener("click", _getFormData)
     resetGameButton.addEventListener("click", resetGame)
+    viewBoard.addEventListener("click", playHand)
+
+    // play hand from button
+    function playHand(event){
+        console.log(event.target.id, "button got pressed")
+        let arrayId = event.target.id.charAt(event.target.id.length - 1)
+        arrayId = parseInt(arrayId)
+        const status = _runGame(arrayId)
+        console.log("Received status", status)
+        if (status.result) {
+            resultDisplay.innerHTML = status.result
+            viewBoard.removeEventListener("click", playHand)
+        } else if (status.updated === false) {
+            console.log("Nothing to increment")
+        } else {
+            console.log("incrementing current chance")
+            currentChance+=1
+        }
+    }
 
     // get input form data
     function _getFormData(event) {
@@ -60,13 +83,14 @@ const ticTacToe = (() => {
         console.log("Creating player objects now")
         gameBoard.player1 = _createPlayer(p1_name, "X")
         gameBoard.player2 = _createPlayer(p2_name, "O")
-        const result = _runGame()
-        console.log("Game result:", result)
-        resetGame()
+        _renderBoard()
     }
 
     // render board
     function _renderBoard() {
+        if (currentChance == 0) {
+            turnIndicator.innerHTML = `${gameBoard.player1.name} (${gameBoard.player1.sign}) Turn Now`
+        }
         console.log("Rendering board")
         console.log(gameBoard.board[0], gameBoard.board[1], gameBoard.board[2])
         console.log(gameBoard.board[3], gameBoard.board[4], gameBoard.board[5])
@@ -82,39 +106,49 @@ const ticTacToe = (() => {
     }
 
     // run game
-    function _runGame() {
+    function _runGame(pos) {
         console.warn("Gameboard length is", gameBoard.board.length)
-        for (let i=0; i<gameBoard.board.length; i++) {
-            if (i%2 == 0) {
-                turnIndicator.innerHTML = `${gameBoard.player1.name} (${gameBoard.player1.sign}) Turn Now`
-                const p1_pos = parseInt(prompt(`${gameBoard.player1.name}: 's  position`).trim())
-                const p1_chance = _markSign(gameBoard.player1.sign, p1_pos)
+        if (currentChance < gameBoard.board.length) {
+            if (currentChance % 2 == 0) {
+                const p1_chance = _markSign(gameBoard.player1.sign, pos)
+                if (!p1_chance.updated) {
+                    return {updated: false}
+                }
                 console.log(`${gameBoard.player1.name} marked spot in location ${p1_chance.pos}`)
                 if (p1_chance.win) {
                     console.log(`${gameBoard.player1.name} won`)
                     return {result: `${gameBoard.player1.name} won`}
                 }
-            } else {
+                console.warn("Finished round:", currentChance+1)
                 turnIndicator.innerHTML = `${gameBoard.player2.name} (${gameBoard.player2.sign}) Turn Now`
-                const p2_pos = parseInt(prompt(`${gameBoard.player2.name}'s  position`).trim())
-                const p2_chance = _markSign(gameBoard.player2.sign, p2_pos)
+                return {updated: p1_chance.updated}
+            } else {
+                const p2_chance = _markSign(gameBoard.player2.sign, pos)
+                if (!p2_chance.updated) {
+                    return {updated: false}
+                }
                 console.log(`${gameBoard.player2.name} marked spot in location ${p2_chance.pos}`)
                 if (p2_chance.win) {
                     console.log(`${gameBoard.player2.name} won`)
                     return {result: `${gameBoard.player2.name} won`}
                 }
+                console.warn("Finished round:", currentChance+1)
+                turnIndicator.innerHTML = `${gameBoard.player1.name} (${gameBoard.player1.sign}) Turn Now`
+                return {updated: p2_chance.updated}
             }
-            console.warn("Finished round:", i+1)
+        } else {
+            return { result: "drawn"}
         }
-        return { result: "drawn"}
     }
 
     // mark sign
     function _markSign(sign, pos) {
-        gameBoard.board[pos] = sign
-        console.log(gameBoard.board)
-        _renderBoard()
-        return {pos: pos, win: _checkWinner(sign)}
+        if (gameBoard.board[pos] != "X" || gameBoard.board[pos] != "X") {
+            gameBoard.board[pos] = sign
+            _renderBoard()
+            return {pos: pos, win: _checkWinner(sign), updated: true}
+        }
+        return {updated: false}
     }
 
     // check for winner
