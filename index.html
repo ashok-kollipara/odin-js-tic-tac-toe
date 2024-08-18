@@ -1,5 +1,40 @@
 <!Doctype html>
 <html>
-    <title>JS Tic Tac Toe</title>
-    <script src="./script.js"></script>
+    <head>
+        <title>JS Tic Tac Toe</title>
+        <script defer src="./script.js"></script>
+        <link rel="stylesheet" href="./styles.css">
+    </head>
+    <body>
+        <h1 class="name">Tic Tac Toe XO</h1>
+        <div class="setup-game">
+            <button class="start-game game-buttons"> > Start Game </button>
+            <button class="reset-game game-buttons"> @ Reset Game </button>
+        </div>
+        <dialog type="modal" class="input-modal">
+            <div class="input-players">
+                <form method="dialog" class="player-details">
+                    <div class="player1-details">
+                        <label for="player1">Player (X) Name: </label>
+                        <input type="text" id="player1" name="player1" required>
+                    </div>
+                    <div class="player2-details">
+                        <label for="player2">Player (O) Name: </label>
+                        <input type="text" id="player2" name="player2" required>
+                    </div>
+                    <div class="submit-details">
+                        <input type="submit" id="submit-players" value="Submit">
+                    </div>
+                </form>
+            </div>
+        </dialog>
+        <div class="game-container">
+            <div class="show-current-turn">
+            </div>
+            <div class="game-board">
+            </div>
+            <div class="game-result">
+            </div>
+        </div>
+    </body>
 </html>
